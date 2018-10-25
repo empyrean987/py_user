@@ -9,16 +9,28 @@ parser.add_argument("-d", "--delete", help="Delete User")
 parser.add_argument("-l", "--list", action="store_true", help='list users')
 args = parser.parse_args()
 
-def add_user():
+def add_user(user, key):
   try:
-    os.system("useradd foo")
+    all_users = pwd.getpwall()
+    if user in str(all_users):
+      print "User already exists"
+    else:	
+      os.system("mkdir -p /home/"+user+"/.ssh")
+      path_split = key.split("/")
+      key_file = path_split[-1]
+      os.system("cp "+key+" /home/"+user+"/.ssh/authorized_keys")
+      os.system("chmod 644 /home/"+user+"/.ssh/authorized_keys")
+      os.system("useradd -d /home/"+user+" "+user)
+      os.system("chown -R "+user+":"+user+" /home/"+user+"/")
+      os.system("chown root:root /home/"+user)
+      os.system("chmod 700 /home/"+user+"/.ssh")
+      print "User has been added"
   except Exception, e:
     print "Issue Creating users Exception: "+str(e)
 
-def delete_user():
+def delete_user(user):
   try:
-    os.system("deluser foo")
-    print "bah"
+    os.system("deluser --remove-home "+user)
   except Exception, e:
    print "Issue Deleteing users Exception: "+str(e)
 
@@ -34,8 +46,8 @@ def list_user():
 if args.list:
   list_user()
 elif args.key and args.add:
-  add_user()
+  add_user(args.add, args.key)
 elif args.delete:
-  delete_user()
+  delete_user(args.delete)
 else:
   print "Use --help option to show Arguments"
