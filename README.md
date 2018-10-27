@@ -1,25 +1,38 @@
+#BUILD IMAGE
 We are using the base Ubuntu 16.0.4 image given by Amazon with the following script ran on it to create new AMI. No special python modules needed to be installed into this image.
 To Build this AMI used the following process to build it.
 
 apt-get update
+
 apt-get -y install python-pip
+
 pip install aws-ec2-assign-elastic-ip
+
 apt-get -y install awscli
+
 apt-get -y install cloud-utils
-# Build the image
+
 TODAYSDATE=`date +'%Y-%m-%d-%s'`
+
 EC2_INSTANCE_ID=$(ec2metadata --instance-id)
+
 aws ec2 create-image --instance-id $EC2_INSTANCE_ID --name UBUNTU-16.04-${TODAYSDATE} --description "Ubuntu 16.04 ${TODAYSDATE}" --no-reboot --region us-west-2
 
 To deploy this repository you can clone it on the AMI above or base ubuntu 16.04 image from Amazon. You can also use the terraform deployment or chef deployment described in the following two repos.
+
 https://github.com/empyrean987/chef_user
+
 https://github.com/empyrean987/Terraform/tree/master/user_test/mgmt_blue
 
 
-ADD
+#ADD
+
 root@ip-192-168-0-133:~/py_user/bin# cd /home/ubuntu/
+
 root@ip-192-168-0-133:~# mkdir rsa
+
 root@ip-192-168-0-133:~# cd rsa
+
 root@ip-192-168-0-133:~/rsa# ssh-keygen -a 1000 -b 4096 -C "" -E sha256 -o -t rsa
 Generating public/private rsa key pair.
 Enter file in which to save the key (/root/.ssh/id_rsa): /home/ubuntu/rsa/user_test
@@ -41,21 +54,30 @@ The key's randomart image is:
 |     + o+B.  .   |
 |      .oo+*.  E  |
 +----[SHA256]-----+
+
 root@ip-192-168-0-133:~/rsa# cd /home/ubuntu/py_user/bin
+
 root@ip-192-168-0-133:~/py_user/bin# ./py_user.py -a usertest -k /home/ubuntu/rsa/user_test.pub
 User has been added
 
 
-DELETE
+#DELETE
+
 root@ip-192-168-0-133:~/py_user/bin# ./py_user.py -d usertest
+
 Looking for files to backup/remove ...
+
 Removing files ...
+
 Removing user `usertest' ...
+
 Warning: group `usertest' has no more members.
+
 Done.
 
 
-LIST
+#LIST
+
 root@ip-192-168-0-133:~/py_user/bin# ./py_user.py -l
 User_Name:root, UID:0, Comments:root
 User_Name:daemon, UID:1, Comments:daemon
